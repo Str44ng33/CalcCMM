@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CalcCMM</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#07070a;
+    --panel:#0f1316;
+    --muted:#9aa2a6;
+    --radius:14px;
+    --trans:360ms cubic-bezier(.2,.9,.2,1);
+    --yellow:#ffcc00;
+    --green:#35b15a;
+    --red:#e04b4b;
+    --text:#e9eef1;
+    --glass: rgba(255,255,255,0.03);
+  }
+
+  body.default { --theme: var(--yellow); }
+  body.ok      { --theme: var(--green);  }
+  body.fail    { --theme: var(--red);    }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;align-items:center;justify-content:center;padding:28px}
+
+  .wrap{ width:min(1040px,96vw); display:flex; flex-direction:column; gap:18px; align-items:center; animation:intro .42s var(--trans) both; }
+  @keyframes intro{ from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none} }
+
+  header{ width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  header .brand{ display:flex; flex-direction:column; }
+  header h1{ margin:0; color:var(--theme); font-size:28px; letter-spacing:0.6px; transition:color var(--trans); font-weight:700; }
+  header p{ margin:2px 0 0 0; color:var(--muted); font-size:13px; }
+
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; width:100%; align-items:start; }
+
+  .card{
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
+    border-radius:var(--radius);
+    border:1px solid rgba(255,255,255,0.04);
+    padding:18px;
+    box-shadow: 0 10px 24px rgba(2,6,10,0.7);
+    position:relative;
+    overflow:visible;
+    transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
+  }
+  .card:hover{ transform: translateY(-8px); box-shadow: 0 20px 48px rgba(2,6,10,0.8); border-color: rgba(255,255,255,0.06); }
+
+  .card .title{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:12px; }
+  .card .title strong{ color:var(--theme); transition:color var(--trans); font-size:15px; }
+
+  .accent{
+    height:4px; width:100%; border-radius:8px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+    position:absolute; left:0; top:-6px;
+    overflow:hidden;
+  }
+  .accent::before{
+    content:""; position:absolute; left:-40%; top:0; width:40%; height:100%;
+    background:linear-gradient(90deg, transparent, var(--theme), transparent);
+    animation: sweep 2.2s linear infinite;
+    opacity:0.6;
+  }
+  @keyframes sweep{ 0%{left:-40%} 100%{left:120%} }
+
+  .inputs{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; justify-content:center; }
+
+  .field{ min-width:120px; flex:1; display:flex; flex-direction:column; align-items:stretch; }
+  .field label{ font-size:12px; color:var(--muted); margin-bottom:6px; }
+
+  input[type="number"]{
+    padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+    background:linear-gradient(180deg, rgba(255,255,255,0.005), rgba(255,255,255,0.003));
+    color:var(--text); font-size:15px; text-align:center; transition: transform 220ms ease, border-color var(--trans), box-shadow var(--trans);
+    -moz-appearance: textfield;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
+  input[type="number"]:focus{ outline:none; transform:translateY(-4px) scale(1.01); border-color:rgba(255,255,255,0.10); box-shadow: 0 14px 34px rgba(0,0,0,0.65); }
+
+  .btn{ margin-top:12px; padding:10px 14px; border-radius:10px; border:2px solid var(--theme); background:transparent; color:var(--theme); font-weight:700; cursor:pointer; transition: transform 160ms ease, background var(--trans), color var(--trans); position:relative; overflow:hidden; }
+  .btn:hover{ transform:translateY(-6px); background: rgba(255,255,255,0.015); }
+  .btn:active{ transform:translateY(-3px) scale(.995); }
+
+  .btn .r{ position:absolute; left:50%; top:50%; width:140%; height:260%; background:var(--theme); opacity:0.03; transform:translate(-50%,-50%) scale(0); border-radius:50%; transition:transform 600ms ease, opacity 600ms; pointer-events:none; }
+  .btn:active .r{ transform:translate(-50%,-50%) scale(1); opacity:0.08; transition:transform 180ms ease, opacity 300ms; }
+
+  .result{ margin-top:10px; display:inline-block; font-weight:800; color:var(--theme); font-size:18px; padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,0.03); transition: transform .42s cubic-bezier(.2,.9,.2,1), color var(--trans); }
+  .result.small{ font-size:14px; font-weight:700; padding:6px 10px; }
+
+  .corner { position:absolute; right:12px; bottom:12px; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.06); font-size:20px; transform:rotate(-20deg); pointer-events:none; }
+
+  .flip{ animation: flip 620ms cubic-bezier(.2,.9,.2,1); transform-origin:center; }
+  @keyframes flip{ 0%{ transform:rotateX(80deg) translateY(-6px); opacity:0 } 60%{ transform:rotateX(-12deg) translateY(2px); opacity:1 } 100%{ transform:rotateX(0) translateY(0); opacity:1 } }
+  .pulse{ animation: pulse .7s ease; }
+  @keyframes pulse{ 0%{ transform:scale(1)} 50%{ transform:scale(1.02)} 100%{ transform:scale(1)} }
+
+  footer{ margin-top:8px; color:var(--muted); font-size:13px; width:100%; text-align:center; }
+
+  @media(max-width:980px){ .grid{ grid-template-columns:1fr; } .wrap{ width:94vw } }
+</style>
+</head>
+<body class="default">
+  <div class="wrap" role="application">
+    <header>
+      <div class="brand">
+        <h1>CalcCMM</h1>
+      </div>
+      <div style="text-align:right;color:var(--muted);font-size:13px"></div>
+    </header>
+
+    <main class="grid" aria-live="polite">
+      <section class="card" id="card-np">
+        <div class="accent" aria-hidden="true"></div>
+        <div class="title"><strong>Calcular NP</strong><div style="color:var(--muted);font-size:13px">AP média + GIP + AE</div></div>
+
+        <div class="inputs" role="group" aria-label="Inputs para calcular NP">
+          <div class="field"><label>AP1 (0–10)</label><input id="ap1" type="number" max="10" min="0" /></div>
+          <div class="field"><label>AP2 (0–10)</label><input id="ap2" type="number" max="10" min="0" /></div>
+          <div class="field"><label>AP3 (0–10)</label><input id="ap3" type="number" max="10" min="0" /></div>
+          <div class="field"><label>GIP (0–1)</label><input id="gip" type="number" max="1" min="0" step="0.01" /></div>
+          <div class="field"><label>AE (0–10)</label><input id="ae" type="number" max="10" min="0" /></div>
+        </div>
+
+        <button class="btn" onclick="calcularNP()" aria-label="Calcular NP">Calcular NP <span class="r"></span></button>
+        <div id="resultadoNP" class="result">NP = -</div>
+        <div class="corner">→</div>
+      </section>
+
+      <section class="card" id="card-ae">
+        <div class="accent" aria-hidden="true"></div>
+        <div class="title"><strong>Quanto preciso tirar na AE?</strong><div style="color:var(--muted);font-size:13px">Meta fixa: NP = 6</div></div>
+
+        <div class="inputs">
+          <div class="field"><label>AP1 (0–10)</label><input id="ap1x" type="number" max="10" min="0" /></div>
+          <div class="field"><label>AP2 (0–10)</label><input id="ap2x" type="number" max="10" min="0" /></div>
+          <div class="field"><label>AP3 (0–10)</label><input id="ap3x" type="number" max="10" min="0" /></div>
+          <div class="field"><label>GIP (0–1)</label><input id="gipx" type="number" max="1" min="0" step="0.01" /></div>
+        </div>
+
+        <button class="btn" onclick="calcularAE()">Calcular AE necessária <span class="r"></span></button>
+        <div id="resultadoAE" class="result small">AE necessária = -</div>
+        <div class="corner">⌁</div>
+      </section>
+
+      <section class="card" id="card-rec">
+        <div class="accent" aria-hidden="true"></div>
+        <div class="title"><strong>Quanto preciso na recuperação?</strong><div style="color:var(--muted);font-size:13px">((NP + x) / 2) = 6 → x = 12 - NP</div></div>
+
+        <div class="inputs">
+          <div class="field" style="min-width:160px"><label>NP atual (0–10)</label><input id="npRec" type="number" max="10" min="0" /></div>
+        </div>
+
+        <button class="btn" onclick="calcularRecuperacao()">Calcular Recuperação <span class="r"></span></button>
+        <div id="resultadoRec" class="result small">Recuperação = -</div>
+        <div class="corner">↺</div>
+      </section>
+
+      <section class="card" id="card-prf">
+        <div class="accent" aria-hidden="true"></div>
+        <div class="title"><strong>Passei na PRF?</strong><div style="color:var(--muted);font-size:13px">Média das 3 NPs — precisa ser ≥ 6</div></div>
+
+        <div class="inputs">
+          <div class="field"><label>NP1 (0–10)</label><input id="prf_np1" type="number" max="10" min="0" /></div>
+          <div class="field"><label>NP2 (0–10)</label><input id="prf_np2" type="number" max="10" min="0" /></div>
+          <div class="field"><label>NP3 (0–10)</label><input id="prf_np3" type="number" max="10" min="0" /></div>
+        </div>
+
+        <button class="btn" onclick="calcularPRF()">Verificar PRF <span class="r"></span></button>
+        <div id="resultadoPRF" class="result small">PRF = -</div>
+        <div class="corner">✶</div>
+      </section>
+    </main>
+
+    <footer></footer>
+  </div>
+
+<script>
+function arredondaEspecial(num){
+  if(!isFinite(num)) return NaN;
+  if(num < 0) num = 0;
+  if(num > 10) num = 10;
+  let n = Math.ceil(num * 10) / 10;
+  let firstDecimal = Math.floor(n * 10) % 10;
+  if(firstDecimal % 2 === 1){
+    n = +(n + 0.1).toFixed(1);
+    if(n > 10) n = 10;
+  }
+  return n.toFixed(1);
+}
+
+function aplicarTemaPorValor(valor){
+  let v = Number(valor);
+  document.body.classList.remove('default','ok','fail');
+  if(!isFinite(v)){
+    document.body.classList.add('default');
+    return;
+  }
+  document.querySelectorAll('.result').forEach(n=>{ n.classList.remove('flip','pulse'); void n.offsetWidth; n.classList.add('flip','pulse'); });
+
+  if(v >= 6) document.body.classList.add('ok');
+  else document.body.classList.add('fail');
+
+  setTimeout(()=> document.querySelectorAll('.result').forEach(n=>n.classList.remove('pulse')), 800);
+}
+
+function val(id){
+  const v = parseFloat(document.getElementById(id).value);
+  return (isFinite(v) ? v : 0);
+}
+
+function calcularNP(){
+  const ap = (val('ap1') + val('ap2') + val('ap3')) / 3;
+  const gip = val('gip'), ae = val('ae');
+  const np = 0.4 * (ap + gip) + 0.6 * ae;
+  const npFinal = arredondaEspecial(np);
+  document.getElementById('resultadoNP').innerText = "NP = " + npFinal;
+  aplicarTemaPorValor(Number(npFinal));
+}
+
+function calcularAE(){
+  const ap = (val('ap1x') + val('ap2x') + val('ap3x')) / 3;
+  const gip = val('gipx');
+  const ae = (6 - 0.4 * (ap + gip)) / 0.6;
+  const aeFinal = arredondaEspecial(ae);
+  document.getElementById('resultadoAE').innerText = "AE necessária = " + aeFinal;
+  aplicarTemaPorValor(Number(aeFinal));
+}
+
+function calcularRecuperacao(){
+  const npVal = val('npRec');
+  const x = 12 - npVal;
+  const xFinal = arredondaEspecial(x);
+  document.getElementById('resultadoRec').innerText = "Recuperação = " + xFinal;
+  aplicarTemaPorValor(Number(npVal));
+}
+
+function calcularPRF(){
+  const media = (val('prf_np1') + val('prf_np2') + val('prf_np3')) / 3;
+  const mediaFinal = arredondaEspecial(media);
+  const passou = Number(mediaFinal) >= 6;
+  const simbolo = passou ? "✓" : "✗";
+  const texto = `Média = ${mediaFinal} — ${simbolo} ${passou ? 'Passou' : 'Não passou'}`;
+  document.getElementById('resultadoPRF').innerText = texto;
+  aplicarTemaPorValor(Number(mediaFinal));
+}
+
+document.querySelectorAll('input[type="number"]').forEach(i=>{
+  i.addEventListener('focus', ()=> i.classList.add('focus'));
+  i.addEventListener('blur', ()=> i.classList.remove('focus'));
+  i.addEventListener('keydown', e=>{
+    if(e.key === 'Enter'){
+      const card = i.closest('.card');
+      if(card){
+        const btn = card.querySelector('.btn');
+        if(btn) btn.click();
+      }
+    }
+  });
+});
+
+document.querySelectorAll('.btn').forEach(b=>{
+  if(!b.querySelector('.r')){ const s=document.createElement('span'); s.className='r'; b.appendChild(s); }
+});
+</script>
+</body>
+</html>
