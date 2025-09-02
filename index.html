@@ -2,150 +2,215 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
 <title>CalcCMM</title>
 <link rel="icon" type="image/png" href="https://i.imgur.com/ECsh74x.png">
 <link rel="apple-touch-icon" href="https://i.imgur.com/ECsh74x.png">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --bg:#07070a;
-    --panel:#0f1316;
-    --muted:#9aa2a6;
-    --radius:14px;
-    --trans:360ms cubic-bezier(.2,.9,.2,1);
-    --yellow:#ffcc00;
-    --green:#35b15a;
-    --red:#e04b4b;
-    --text:#e9eef1;
-    --glass: rgba(255,255,255,0.03);
-  }
-
-  /* reduz animações se o usuário preferir */
-  @media (prefers-reduced-motion: reduce){
-    :root{ --trans:100ms cubic-bezier(.2,.9,.2,1); }
-    *{ animation-duration: 0.001ms !important; transition-duration:0.001ms !important; }
-  }
-
-  *{box-sizing:border-box}
-  /* === MUDANÇA MÍNIMA AQUI: permite rolagem e posiciona o conteúdo no topo === */
-  html,body{
-    min-height:100vh;
-    margin:0;
-    background:var(--bg);
-    color:var(--text);
-    font-family:Inter,system-ui,Arial;
-    -webkit-font-smoothing:antialiased;
-    -moz-osx-font-smoothing:grayscale;
-    display:flex;
-    align-items:flex-start;        /* <- trocado: evita centralizar vertical e cortar conteúdo */
-    justify-content:center;
-    padding:18px env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);
-    overflow-y:auto;               /* <- permite rolagem quando o conteúdo excede a viewport */
-    -webkit-overflow-scrolling: touch;
-    scroll-padding-top: calc(18px + env(safe-area-inset-top));
-  }
-  /* ======================================================================== */
-
-  body.default { --theme: var(--yellow); }
-  body.ok      { --theme: var(--green);  }
-  body.fail    { --theme: var(--red);    }
-
-  .wrap{ width:min(1040px,98vw); display:flex; flex-direction:column; gap:14px; align-items:center; animation:intro .42s var(--trans) both; }
-  @keyframes intro{ from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none} }
-
-  header{ width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:4px 2px; }
-  header .brand{ display:flex; flex-direction:column; }
-  header h1{ margin:0; color:var(--theme); font-size:26px; letter-spacing:0.6px; transition:color var(--trans); font-weight:700; }
-  header p{ margin:2px 0 0 0; color:var(--muted); font-size:13px; }
-
-  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; width:100%; align-items:start; }
-
-  .card{
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.00));
-    border-radius:var(--radius);
-    border:1px solid rgba(255,255,255,0.04);
-    padding:14px;
-    box-shadow: 0 10px 24px rgba(2,6,10,0.7);
-    position:relative;
-    overflow:visible;
-    transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
-  }
-  .card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,10,0.78); border-color: rgba(255,255,255,0.06); }
-
-  .card .title{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
-  .card .title strong{ color:var(--theme); transition:color var(--trans); font-size:15px; }
-
-  .accent{
-    height:4px; width:100%; border-radius:8px; background:linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
-    position:absolute; left:0; top:-6px;
-    overflow:hidden;
-  }
-  .accent::before{
-    content:""; position:absolute; left:-40%; top:0; width:40%; height:100%;
-    background:linear-gradient(90deg, transparent, var(--theme), transparent);
-    animation: sweep 2.2s linear infinite;
-    opacity:0.6;
-  }
-  @keyframes sweep{ 0%{left:-40%} 100%{left:120%} }
-
-  .inputs{ display:flex; gap:10px; flex-wrap:wrap; margin-top:6px; justify-content:center; }
-
-  .field{ min-width:120px; flex:1; display:flex; flex-direction:column; align-items:stretch; }
-  .field label{ font-size:12px; color:var(--muted); margin-bottom:6px; }
-
-  input[type="number"]{
-    padding:12px 14px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
-    background:linear-gradient(180deg, rgba(255,255,255,0.005), rgba(255,255,255,0.003));
-    color:var(--text); font-size:16px; text-align:center; transition: transform 220ms ease, border-color var(--trans), box-shadow var(--trans);
-    -moz-appearance: textfield;
-  }
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
-  input[type="number"]:focus{ outline:none; transform:translateY(-4px) scale(1.01); border-color:rgba(255,255,255,0.10); box-shadow: 0 14px 34px rgba(0,0,0,0.65); }
-
-  .btn{ margin-top:12px; padding:12px 14px; border-radius:10px; border:2px solid var(--theme); background:transparent; color:var(--theme); font-weight:700; cursor:pointer; transition: transform 160ms ease, background var(--trans), color var(--trans); position:relative; overflow:hidden; width:100%; }
-  .btn:hover{ transform:translateY(-5px); background: rgba(255,255,255,0.015); }
-  .btn:active{ transform:translateY(-3px) scale(.995); }
-
-  .btn .r{ position:absolute; left:50%; top:50%; width:140%; height:260%; background:var(--theme); opacity:0.03; transform:translate(-50%,-50%) scale(0); border-radius:50%; transition:transform 600ms ease, opacity 600ms; pointer-events:none; }
-  .btn:active .r{ transform:translate(-50%,-50%) scale(1); opacity:0.08; transition:transform 180ms ease, opacity 300ms; }
-
-  .result{ margin-top:10px; display:inline-block; font-weight:800; color:var(--theme); font-size:18px; padding:8px 12px; border-radius:9px; border:1px solid rgba(255,255,255,0.03); transition: transform .42s cubic-bezier(.2,.9,.2,1), color var(--trans); width:100%; text-align:center; }
-  .result.small{ font-size:15px; font-weight:700; padding:8px 12px; }
-
-  .corner { position:absolute; right:12px; bottom:12px; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:rgba(255,255,255,0.06); font-size:20px; transform:rotate(-20deg); pointer-events:none; }
-
-  .flip{ animation: flip 620ms cubic-bezier(.2,.9,.2,1); transform-origin:center; }
-  @keyframes flip{ 0%{ transform:rotateX(80deg) translateY(-6px); opacity:0 } 60%{ transform:rotateX(-12deg) translateY(2px); opacity:1 } 100%{ transform:rotateX(0) translateY(0); opacity:1 } }
-  .pulse{ animation: pulse .7s ease; }
-  @keyframes pulse{ 0%{ transform:scale(1)} 50%{ transform:scale(1.02)} 100%{ transform:scale(1)} }
-
-  footer{ margin-top:8px; color:var(--muted); font-size:13px; width:100%; text-align:center; }
-
-  @media(max-width:980px){
-    .grid{ grid-template-columns:1fr; gap:12px; }
-    header{ flex-direction:column; align-items:flex-start; gap:8px; }
-    header h1{ font-size:22px; }
-    .wrap{ padding:14px; width:100%; }
-    .field{ min-width:100%; }
-    .result{ font-size:16px; padding:10px 12px; }
-    .card{ padding:12px; border-radius:12px; }
-    .corner{ display:none; }
-  }
-
-  @media(max-width:420px){
-    html,body{ padding-left:12px; padding-right:12px; }
-    .wrap{ gap:12px; }
-    body{ font-size:15px; }
-    .card{ padding:12px; border-radius:12px; }
-    .inputs{ gap:8px; }
-    .field label{ font-size:13px; }
-  }
+:root{
+  --bg-1:#04050a;
+  --bg-2:#06121a;
+  --muted:#9aa2a6;
+  --text:#e9eef1;
+  --accent-citrus:#ffd66b;
+  --accent-mint:#63e6d9;
+  --accent-berry:#b695ff;
+  --card-radius:22px;
+  --glass-blur:36px;
+  --inner-blur:14px;
+  --wet-glow:0.22;
+  --soft-ease:cubic-bezier(.16,.9,.28,1);
+  --fast-ease:cubic-bezier(.22,.95,.3,1);
+  --shadow-soft:0 18px 68px rgba(2,6,10,0.55);
+  --shadow-strong:0 44px 160px rgba(2,6,10,0.72);
+  --ui-gap:16px;
+  --ui-pad:18px;
+  --ripple-color: rgba(255,255,255,0.12);
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation-duration:1ms !important;transition-duration:1ms !important}
+  :root{--glass-blur:12px;--wet-glow:0.12}
+}
+*{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+html,body{
+  height:100%;
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
+  background:
+    radial-gradient(44vmax 34vmax at 12% 10%, rgba(255,214,90,0.05), transparent 12%),
+    radial-gradient(34vmax 26vmax at 88% 88%, rgba(99,230,217,0.04), transparent 10%),
+    linear-gradient(180deg,var(--bg-1) 0%,var(--bg-2) 100%);
+  color:var(--text);
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  padding:18px env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);
+  overflow-y:auto;
+  overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;
+  scroll-behavior:smooth;
+  scroll-padding-top:calc(18px + env(safe-area-inset-top));
+  -webkit-touch-callout:none;
+  touch-action:pan-y;
+  -webkit-tap-highlight-color:transparent;
+}
+body.default{--theme:var(--accent-citrus)}
+body.ok{--theme:var(--accent-mint)}
+body.fail{--theme:var(--accent-berry)}
+body::before,body::after{
+  content:"";
+  position:fixed;
+  z-index:0;
+  pointer-events:none;
+  mix-blend-mode:screen;
+  filter:blur(56px) saturate(130%);
+  opacity:0.12;
+}
+body::before{
+  width:44vmax;height:44vmax;left:-6vmax;top:-12vmax;
+  background:
+    radial-gradient(circle at 28% 30%, rgba(255,214,90,0.28), transparent 28%),
+    radial-gradient(circle at 72% 72%, rgba(182,120,255,0.14), transparent 26%);
+  transform:rotate(-6deg);
+  animation:floatSlow 20s linear infinite;
+}
+body::after{
+  width:36vmax;height:36vmax;right:-8vmax;bottom:-6vmax;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(99,230,217,0.2), transparent 28%),
+    radial-gradient(circle at 80% 20%, rgba(182,120,255,0.09), transparent 26%);
+  animation:floatSlow 26s linear infinite reverse;
+}
+@keyframes floatSlow{0%{transform:translateY(0)}50%{transform:translateY(-18px)}100%{transform:translateY(0)}}
+.wrap{position:relative;z-index:1;width:min(1040px,98vw);display:flex;flex-direction:column;gap:var(--ui-gap);align-items:stretch;margin:18px 0;padding:8px}
+header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 8px;z-index:1}
+.brand h1{margin:0;color:var(--theme);font-size:26px;font-weight:800;letter-spacing:0.4px;text-shadow:0 14px 48px rgba(0,0,0,0.55)}
+.brand p{margin:4px 0 0 0;color:var(--muted);font-size:13px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:var(--ui-gap);width:100%;align-items:start}
+.card{
+  position:relative;
+  overflow:visible;
+  padding:var(--ui-pad);
+  border-radius:var(--card-radius);
+  border:1px solid rgba(255,255,255,0.06);
+  background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.006));
+  backdrop-filter:blur(var(--glass-blur)) saturate(150%);
+  -webkit-backdrop-filter:blur(var(--glass-blur)) saturate(150%);
+  box-shadow:var(--shadow-soft);
+  transition:transform 420ms var(--soft-ease),box-shadow 420ms var(--soft-ease),border-color 320ms var(--fast-ease);
+  will-change:transform;
+  transform-style:preserve-3d;
+  --mx:0;
+  --my:0;
+  --sheenX:50%;
+  --sheenY:-20%;
+}
+.card .wet-rim{position:absolute;inset:-2px;pointer-events:none;border-radius:calc(var(--card-radius) + 2px);background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.00));padding:2px;filter:blur(8px);opacity:var(--wet-glow);z-index:0}
+.card::before{
+  content:"";
+  position:absolute;
+  left:0;top:0;right:0;bottom:0;
+  border-radius:inherit;
+  pointer-events:none;
+  box-shadow:0 0 46px rgba(0,0,0,0.45), 0 8px 56px color-mix(in srgb, var(--theme) 28%, transparent);
+  opacity:0.95;
+  mix-blend-mode:screen;
+  transition:box-shadow 420ms var(--soft-ease);
+  z-index:0;
+}
+.card::after{
+  content:"";
+  position:absolute;
+  left:-8%;top:-36%;width:116%;height:66%;border-radius:inherit;
+  background:linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.02));
+  transform:rotate(-10deg);
+  filter:blur(36px);
+  opacity:0.12;
+  pointer-events:none;
+  transition:opacity 420ms var(--fast-ease);
+  z-index:0;
+}
+.card:hover{transform:translateY(-14px) rotateX(calc((var(--my) - 0.5) * 6deg)) rotateY(calc((var(--mx) - 0.5) * -6deg));box-shadow:var(--shadow-strong);border-color:rgba(255,255,255,0.10)}
+.card:active{transform:translateY(-4px) scale(.997)}
+.accent{height:8px;width:100%;border-radius:14px;overflow:hidden;position:absolute;left:0;top:-16px;z-index:1;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.02),transparent)}
+.accent::before{
+  content:"";
+  position:absolute;left:-40%;top:0;width:48%;height:100%;
+  background:linear-gradient(90deg, rgba(255,255,255,0.08), var(--theme), rgba(255,255,255,0.02));
+  filter:blur(10px);animation:sweep 3.8s linear infinite;
+}
+@keyframes sweep{0%{left:-40%}100%{left:150%}}
+.title{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px;z-index:1}
+.title strong{font-size:15px;font-weight:700;color:var(--theme)}
+.inputs{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px;justify-content:center;z-index:1}
+.field{min-width:120px;flex:1;display:flex;flex-direction:column;gap:8px;align-items:stretch}
+.field label{font-size:12px;color:var(--muted);margin-bottom:2px}
+input[type="number"]{
+  -webkit-appearance:none;appearance:none;border:1px solid rgba(255,255,255,0.04);
+  background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.002));
+  color:var(--text);padding:12px 14px;font-size:15px;border-radius:14px;text-align:center;
+  transition:box-shadow 300ms var(--fast-ease),transform 240ms var(--fast-ease),border-color 260ms var(--fast-ease);
+  outline:none;min-height:50px;
+}
+input[type="number"]::placeholder{color:rgba(255,255,255,0.12)}
+input[type="number"]:focus{
+  border-color:color-mix(in srgb, var(--theme) 48%, transparent);
+  box-shadow:0 18px 68px rgba(0,0,0,0.6), 0 0 0 12px rgba(255,255,255,0.02);
+  transform:translateY(-4px) scale(1.01);
+}
+input[type="number"]::-webkit-inner-spin-button,input[type="number"]::-webkit-outer-spin-button{-webkit-appearance:none;margin:0}
+.btn{
+  margin-top:16px;padding:14px 18px;border-radius:16px;border:2px solid var(--theme);
+  background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.002));
+  color:var(--theme);font-weight:800;cursor:pointer;
+  transition:transform 300ms var(--soft-ease),box-shadow 300ms var(--soft-ease),background 300ms var(--fast-ease);
+  position:relative;overflow:hidden;width:100%;display:inline-flex;align-items:center;justify-content:center;gap:10px;min-height:56px;
+  -webkit-tap-highlight-color:transparent;
+}
+.btn:hover{transform:translateY(-10px) scale(1.02);box-shadow:0 48px 120px rgba(0,0,0,0.66)}
+.btn:active{transform:translateY(-2px) scale(.998)}
+.btn .r{position:absolute;left:50%;top:50%;width:140%;height:240%;background:var(--theme);opacity:0.06;transform:translate(-50%,-50%) scale(0);border-radius:50%;transition:transform 360ms var(--fast-ease),opacity 360ms linear;pointer-events:none;filter:blur(6px)}
+.btn:active .r{transform:translate(-50%,-50%) scale(1);opacity:0.16;transition:transform 180ms var(--fast-ease),opacity 160ms linear}
+.result{margin-top:14px;display:inline-block;font-weight:800;color:var(--theme);font-size:18px;padding:12px 16px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);width:100%;text-align:center;background:linear-gradient(180deg, rgba(255,255,255,0.008), rgba(255,255,255,0.002));box-shadow:0 18px 70px rgba(0,0,0,0.55);transition:transform 420ms var(--soft-ease),color 300ms var(--fast-ease)}
+.result.small{font-size:15px;font-weight:700;padding:10px 12px}
+.corner{position:absolute;right:12px;bottom:12px;width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.06);font-size:20px;transform:rotate(-20deg);pointer-events:none}
+.flip{animation:flip 640ms var(--soft-ease);transform-origin:center}
+@keyframes flip{0%{transform:rotateX(82deg) translateY(-8px);opacity:0}60%{transform:rotateX(-10deg) translateY(2px);opacity:1}100%{transform:rotateX(0) translateY(0);opacity:1}}
+.pulse{animation:pulse 720ms ease}
+@keyframes pulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
+footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:center;z-index:1}
+.droplet{position:absolute;border-radius:50%;pointer-events:none;filter:blur(8px) saturate(120%);opacity:0.18;mix-blend-mode:screen;animation:rise 10s infinite linear}
+.droplet.small{width:28px;height:28px;background:radial-gradient(circle at 35% 35%, rgba(255,255,255,0.6), rgba(255,255,255,0.08));animation-duration:9.6s}
+.droplet.med{width:48px;height:48px;background:radial-gradient(circle at 36% 36%, rgba(255,255,255,0.6), rgba(255,255,255,0.06));opacity:0.12;animation-duration:11.2s}
+.droplet.big{width:88px;height:88px;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(255,255,255,0.03));opacity:0.08;animation-duration:14s}
+@keyframes rise{0%{transform:translateY(8px) scale(.98);opacity:0}12%{opacity:0.18}60%{transform:translateY(-28px) scale(1.02);opacity:0.12}100%{transform:translateY(-64px) scale(1.04);opacity:0}}
+.card-ripple{position:absolute;border-radius:50%;pointer-events:none;border:2px solid var(--ripple-color);box-shadow:0 8px 32px rgba(0,0,0,0.45), 0 0 30px var(--ripple-color);opacity:0;transform:scale(0);will-change:transform,opacity}
+.card-sheen{position:absolute;left:0;top:0;right:0;bottom:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--sheenX) var(--sheenY), rgba(255,255,255,0.85), rgba(255,255,255,0.06) 6%, rgba(255,255,255,0.02) 14%, transparent 28%);mix-blend-mode:overlay;opacity:0.12;filter:blur(18px)}
+.sparkle{position:absolute;pointer-events:none;border-radius:50%;mix-blend-mode:screen;filter:blur(6px);opacity:0;animation:spark 2200ms linear infinite}
+@keyframes spark{0%{opacity:0;transform:scale(0.6)}10%{opacity:0.9;transform:scale(1)}90%{opacity:0.1;transform:scale(1.2)}100%{opacity:0;transform:scale(1.4)}}
+@media (max-width:980px){
+  .grid{grid-template-columns:1fr;gap:12px}
+  header{flex-direction:column;align-items:flex-start;gap:8px}
+  .brand h1{font-size:22px}
+  .wrap{padding:8px}
+  .card{padding:14px;border-radius:16px}
+  .result{font-size:16px}
+  .btn{min-height:52px;padding:14px;border-radius:12px}
+  input[type="number"]{min-height:52px;padding:14px;font-size:17px}
+  .corner{display:none}
+}
+@media (max-width:420px){
+  .wrap{gap:12px}
+  body{font-size:15px}
+  .card{padding:12px;border-radius:12px}
+  .inputs{gap:8px}
+  .field label{font-size:13px}
+}
 </style>
 </head>
 <body class="default">
-  <div class="wrap" role="application">
+  <div class="wrap" role="application" aria-label="Aplicação CalcCMM">
     <header>
       <div class="brand">
         <h1>CalcCMM</h1>
@@ -153,65 +218,82 @@
     </header>
 
     <main class="grid" aria-live="polite">
-      <section class="card" id="card-np">
+      <section class="card" id="card-np" style="overflow:visible">
+        <div class="wet-rim" aria-hidden="true"></div>
+        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Calcular NP</strong><div style="color:var(--muted);font-size:13px">AP média + GIP + AE</div></div>
 
         <div class="inputs" role="group" aria-label="Inputs para calcular NP">
-          <div class="field"><label>AP1 (0–10)</label><input id="ap1" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP2 (0–10)</label><input id="ap2" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP3 (0–10)</label><input id="ap3" type="number" max="10" min="0" /></div>
-          <div class="field"><label>GIP (0–1)</label><input id="gip" type="number" max="1" min="0" step="0.01" /></div>
-          <div class="field"><label>AE (0–10)</label><input id="ae" type="number" max="10" min="0" /></div>
+          <div class="field"><label>AP1 (0–10)</label><input id="ap1" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>AP2 (0–10)</label><input id="ap2" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>AP3 (0–10)</label><input id="ap3" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>GIP (0–1)</label><input id="gip" inputmode="decimal" type="number" max="1" min="0" step="0.01" /></div>
+          <div class="field"><label>AE (0–10)</label><input id="ae" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularNP()" aria-label="Calcular NP">Calcular NP <span class="r"></span></button>
         <div id="resultadoNP" class="result">NP = -</div>
         <div class="corner">→</div>
+
+        <div class="droplet small" style="left:6%;bottom:8%"></div>
+        <div class="droplet med" style="right:10%;bottom:14%"></div>
       </section>
 
-      <section class="card" id="card-ae">
+      <section class="card" id="card-ae" style="overflow:visible">
+        <div class="wet-rim" aria-hidden="true"></div>
+        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Quanto preciso tirar na AE?</strong><div style="color:var(--muted);font-size:13px">Meta fixa: NP = 6</div></div>
 
         <div class="inputs">
-          <div class="field"><label>AP1 (0–10)</label><input id="ap1x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP2 (0–10)</label><input id="ap2x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP3 (0–10)</label><input id="ap3x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>GIP (0–1)</label><input id="gipx" type="number" max="1" min="0" step="0.01" /></div>
+          <div class="field"><label>AP1 (0–10)</label><input id="ap1x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>AP2 (0–10)</label><input id="ap2x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>AP3 (0–10)</label><input id="ap3x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>GIP (0–1)</label><input id="gipx" inputmode="decimal" type="number" max="1" min="0" step="0.01" /></div>
         </div>
 
         <button class="btn" onclick="calcularAE()">Calcular AE necessária <span class="r"></span></button>
         <div id="resultadoAE" class="result small">AE necessária = -</div>
         <div class="corner">⌁</div>
+
+        <div class="droplet med" style="left:6%;bottom:12%"></div>
       </section>
 
-      <section class="card" id="card-rec">
+      <section class="card" id="card-rec" style="overflow:visible">
+        <div class="wet-rim" aria-hidden="true"></div>
+        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Quanto preciso na recuperação?</strong><div style="color:var(--muted);font-size:13px">((NP + x) / 2) = 6 → x = 12 - NP</div></div>
 
         <div class="inputs">
-          <div class="field" style="min-width:160px"><label>NP atual (0–10)</label><input id="npRec" type="number" max="10" min="0" /></div>
+          <div class="field" style="min-width:160px"><label>NP atual (0–10)</label><input id="npRec" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularRecuperacao()">Calcular Recuperação <span class="r"></span></button>
         <div id="resultadoRec" class="result small">Recuperação = -</div>
         <div class="corner">↺</div>
+
+        <div class="droplet small" style="right:8%;bottom:6%"></div>
       </section>
 
-      <section class="card" id="card-prf">
+      <section class="card" id="card-prf" style="overflow:visible">
+        <div class="wet-rim" aria-hidden="true"></div>
+        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Passei na PRF?</strong><div style="color:var(--muted);font-size:13px">Média das 3 NPs — precisa ser ≥ 6</div></div>
 
         <div class="inputs">
-          <div class="field"><label>NP1 (0–10)</label><input id="prf_np1" type="number" max="10" min="0" /></div>
-          <div class="field"><label>NP2 (0–10)</label><input id="prf_np2" type="number" max="10" min="0" /></div>
-          <div class="field"><label>NP3 (0–10)</label><input id="prf_np3" type="number" max="10" min="0" /></div>
+          <div class="field"><label>NP1 (0–10)</label><input id="prf_np1" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>NP2 (0–10)</label><input id="prf_np2" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label>NP3 (0–10)</label><input id="prf_np3" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularPRF()">Verificar PRF <span class="r"></span></button>
         <div id="resultadoPRF" class="result small">PRF = -</div>
         <div class="corner">✶</div>
+
+        <div class="droplet big" style="left:10%;bottom:4%"></div>
       </section>
     </main>
 
@@ -221,103 +303,151 @@
 <script>
 function arredondaEspecial(num){
   if(!isFinite(num)) return NaN;
-  if(num < 0) num = 0;
-  if(num > 10) num = 10;
-  let n = Math.ceil(num * 10) / 10;
-  let firstDecimal = Math.floor(n * 10) % 10;
-  if(firstDecimal % 2 === 1){
-    n = +(n + 0.1).toFixed(1);
-    if(n > 10) n = 10;
+  if(num<0) num=0;
+  if(num>10) num=10;
+  let n=Math.ceil(num*10)/10;
+  let firstDecimal=Math.floor(n*10)%10;
+  if(firstDecimal%2===1){
+    n=+(n+0.1).toFixed(1);
+    if(n>10) n=10;
   }
   return n.toFixed(1);
 }
-
 function aplicarTemaPorValor(valor){
-  let v = Number(valor);
+  let v=Number(valor);
   document.body.classList.remove('default','ok','fail');
   if(!isFinite(v)){
     document.body.classList.add('default');
     return;
   }
-  document.querySelectorAll('.result').forEach(n=>{ n.classList.remove('flip','pulse'); void n.offsetWidth; n.classList.add('flip','pulse'); });
-
-  if(v >= 6) document.body.classList.add('ok');
-  else document.body.classList.add('fail');
-
-  setTimeout(()=> document.querySelectorAll('.result').forEach(n=>n.classList.remove('pulse')), 800);
+  document.querySelectorAll('.result').forEach(n=>{n.classList.remove('flip','pulse');void n.offsetWidth;n.classList.add('flip','pulse')});
+  if(v>=6) document.body.classList.add('ok'); else document.body.classList.add('fail');
+  setTimeout(()=>document.querySelectorAll('.result').forEach(n=>n.classList.remove('pulse')),800);
 }
-
 function val(id){
-  const v = parseFloat(document.getElementById(id).value);
-  return (isFinite(v) ? v : 0);
+  const raw=document.getElementById(id).value;
+  const v=parseFloat(String(raw).replace(',','.'));
+  return (isFinite(v)?v:0);
 }
-
 function calcularNP(){
-  const ap = (val('ap1') + val('ap2') + val('ap3')) / 3;
-  const gip = val('gip'), ae = val('ae');
-  const np = 0.4 * (ap + gip) + 0.6 * ae;
-  const npFinal = arredondaEspecial(np);
-  document.getElementById('resultadoNP').innerText = "NP = " + npFinal;
+  const ap=(val('ap1')+val('ap2')+val('ap3'))/3;
+  const gip=val('gip'), ae=val('ae');
+  const np=0.4*(ap+gip)+0.6*ae;
+  const npFinal=arredondaEspecial(np);
+  document.getElementById('resultadoNP').innerText="NP = "+npFinal;
   aplicarTemaPorValor(Number(npFinal));
 }
-
 function calcularAE(){
-  const ap = (val('ap1x') + val('ap2x') + val('ap3x')) / 3;
-  const gip = val('gipx');
-  const ae = (6 - 0.4 * (ap + gip)) / 0.6;
-  const aeFinal = arredondaEspecial(ae);
-  document.getElementById('resultadoAE').innerText = "AE necessária = " + aeFinal;
+  const ap=(val('ap1x')+val('ap2x')+val('ap3x'))/3;
+  const gip=val('gipx');
+  const ae=(6-0.4*(ap+gip))/0.6;
+  const aeFinal=arredondaEspecial(ae);
+  document.getElementById('resultadoAE').innerText="AE necessária = "+aeFinal;
   aplicarTemaPorValor(Number(aeFinal));
 }
-
 function calcularRecuperacao(){
-  const npVal = val('npRec');
-  const x = 12 - npVal;
-  const xFinal = arredondaEspecial(x);
-  document.getElementById('resultadoRec').innerText = "Recuperação = " + xFinal;
+  const npVal=val('npRec');
+  const x=12-npVal;
+  const xFinal=arredondaEspecial(x);
+  document.getElementById('resultadoRec').innerText="Recuperação = "+xFinal;
   aplicarTemaPorValor(Number(npVal));
 }
-
 function calcularPRF(){
-  const media = (val('prf_np1') + val('prf_np2') + val('prf_np3')) / 3;
-  const mediaFinal = arredondaEspecial(media);
-  const passou = Number(mediaFinal) >= 6;
-  const simbolo = passou ? "✓" : "✗";
-  const texto = `Média = ${mediaFinal} — ${simbolo} ${passou ? 'Passou' : 'Não passou'}`;
-  document.getElementById('resultadoPRF').innerText = texto;
+  const media=(val('prf_np1')+val('prf_np2')+val('prf_np3'))/3;
+  const mediaFinal=arredondaEspecial(media);
+  const passou=Number(mediaFinal)>=6;
+  const simbolo=passou?"✓":"✗";
+  const texto=`Média = ${mediaFinal} — ${simbolo} ${passou?'Passou':'Não passou'}`;
+  document.getElementById('resultadoPRF').innerText=texto;
   aplicarTemaPorValor(Number(mediaFinal));
 }
-
 document.querySelectorAll('input[type="number"]').forEach(i=>{
-  i.addEventListener('focus', ()=> i.classList.add('focus'));
-  i.addEventListener('blur', ()=> i.classList.remove('focus'));
-  i.addEventListener('keydown', e=>{
-    if(e.key === 'Enter'){
-      const card = i.closest('.card');
-      if(card){
-        const btn = card.querySelector('.btn');
-        if(btn) btn.click();
-      }
-    }
-  });
+  i.addEventListener('focus',()=>i.classList.add('focus'));
+  i.addEventListener('blur',()=>i.classList.remove('focus'));
+  i.addEventListener('keydown',e=>{if(e.key==='Enter'){const card=i.closest('.card');if(card){const btn=card.querySelector('.btn');if(btn)btn.click()}}});
+  i.addEventListener('touchstart',()=>{try{i.select()}catch(e){}});
+  i.addEventListener('focus',()=>{setTimeout(()=>{try{i.scrollIntoView({behavior:'smooth',block:'center',inline:'nearest'})}catch(e){}},260)});
 });
-
 document.querySelectorAll('.btn').forEach(b=>{
-  if(!b.querySelector('.r')){ const s=document.createElement('span'); s.className='r'; b.appendChild(s); }
-});
-
-// === ADICIONADO: garante que input focado vire visível (ajuda no mobile quando o teclado abre) ===
-document.querySelectorAll('input[type="number"]').forEach(input=>{
-  input.addEventListener('focus', ()=> {
-    setTimeout(()=> {
-      try {
-        input.scrollIntoView({behavior:'smooth', block:'center', inline:'nearest'});
-      } catch(e){ /* silent */ }
-    }, 250);
+  if(!b.querySelector('.r')){const s=document.createElement('span');s.className='r';b.appendChild(s)}
+  b.addEventListener('pointerdown',function(ev){
+    const r=this.querySelector('.r');
+    const rect=this.getBoundingClientRect();
+    const size=Math.max(rect.width,rect.height)*1.6;
+    r.style.width=r.style.height=size+'px';
+    const left=(ev.clientX-rect.left)-size/2;
+    const top=(ev.clientY-rect.top)-size/2;
+    r.style.left=left+'px';
+    r.style.top=top+'px';
+    r.style.transition='transform 360ms var(--fast-ease), opacity 360ms linear';
+    r.style.transform='scale(0)';
+    r.style.opacity='0.06';
+    requestAnimationFrame(()=>{r.style.transform='scale(1)';r.style.opacity='0.16'});
+    setTimeout(()=>{r.style.opacity='0'},260);
   });
 });
-// ========================================================================
-
+document.addEventListener('pointerup',()=>{document.querySelectorAll('.btn .r').forEach(r=>{r.style.transition='opacity 260ms linear, transform 260ms var(--fast-ease)';r.style.transform='scale(1)';r.style.opacity='0'})});
+document.querySelectorAll('.card').forEach((card)=>{
+  const prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const sheen=card.querySelector('.card-sheen');
+  if(!prefersReduced){
+    card.addEventListener('pointerdown',(ev)=>{
+      const rect=card.getBoundingClientRect();
+      const x=ev.clientX-rect.left;
+      const y=ev.clientY-rect.top;
+      const ripple=document.createElement('div');
+      ripple.className='card-ripple';
+      const size=Math.max(rect.width,rect.height)*1.2;
+      ripple.style.width=size+'px';
+      ripple.style.height=size+'px';
+      ripple.style.left=(x-size/2)+'px';
+      ripple.style.top=(y-size/2)+'px';
+      card.appendChild(ripple);
+      requestAnimationFrame(()=>{ripple.style.transition='transform 720ms var(--soft-ease), opacity 720ms linear';ripple.style.transform='scale(1)';ripple.style.opacity='0.14'});
+      setTimeout(()=>{ripple.style.opacity='0';ripple.style.transform='scale(1.6)'},260);
+      setTimeout(()=>{if(ripple&&ripple.parentNode)ripple.parentNode.removeChild(ripple)},880);
+      for(let i=0;i<6;i++){
+        const sp=document.createElement('div');
+        sp.className='sparkle';
+        const s=(Math.random()*8)+6;
+        sp.style.width=s+'px';
+        sp.style.height=s+'px';
+        sp.style.left=(Math.random()*80+8)+'%';
+        sp.style.top=(Math.random()*70+10)+'%';
+        sp.style.background=`radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.12))`;
+        sp.style.animationDuration=(1200+Math.random()*1200)+'ms';
+        card.appendChild(sp);
+        setTimeout(()=>{if(sp&&sp.parentNode)sp.parentNode.removeChild(sp)},1700);
+      }
+    });
+    let raf=false;
+    card.addEventListener('pointermove',(ev)=>{
+      if(prefersReduced) return;
+      if(!raf){
+        raf=true;
+        requestAnimationFrame(()=>{
+          const rect=card.getBoundingClientRect();
+          const mx=(ev.clientX-rect.left)/rect.width;
+          const my=(ev.clientY-rect.top)/rect.height;
+          card.style.setProperty('--mx',mx);
+          card.style.setProperty('--my',my);
+          card.style.setProperty('--sheenX',Math.round(mx*100)+'%');
+          card.style.setProperty('--sheenY',Math.round(my*100-30)+'%');
+          raf=false;
+        });
+      }
+    });
+    card.addEventListener('pointerleave',()=>{
+      card.style.setProperty('--mx',0.5);
+      card.style.setProperty('--my',0.5);
+      card.style.setProperty('--sheenX','50%');
+      card.style.setProperty('--sheenY','-20%');
+    });
+  }
+});
+document.querySelectorAll('.card').forEach((c,i)=>{c.style.opacity=0;c.style.transform='translateY(12px) scale(0.996)';setTimeout(()=>{c.style.transition='opacity 520ms var(--soft-ease), transform 520ms var(--soft-ease)';c.style.opacity=1;c.style.transform='translateY(0) scale(1)'},70+i*60)});
+document.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Spacebar')&&document.activeElement&&document.activeElement.classList.contains('btn')){e.preventDefault();document.activeElement.click()}});
 </script>
 </body>
 </html>
+
