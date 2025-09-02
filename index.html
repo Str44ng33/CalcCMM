@@ -2,7 +2,8 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<meta name="theme-color" content="#07070a" />
 <title>CalcCMM</title>
 <link rel="icon" type="image/png" href="https://i.imgur.com/ECsh74x.png">
 <link rel="apple-touch-icon" href="https://i.imgur.com/ECsh74x.png">
@@ -19,16 +20,23 @@
     --red:#e04b4b;
     --text:#e9eef1;
     --glass: rgba(255,255,255,0.03);
+    --touch-padding:14px;
   }
+
+  /* reduce motion for users who prefer it */
+  @media (prefers-reduced-motion: reduce){
+    :root{ --trans:100ms cubic-bezier(.2,.9,.2,1); }
+    *{ animation-duration: 0.001ms !important; transition-duration:0.001ms !important; }
+  }
+
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;align-items:center;justify-content:center;padding:18px env(safe-area-inset-left) env(safe-area-inset-bottom) env(safe-area-inset-right);}
 
   body.default { --theme: var(--yellow); }
   body.ok      { --theme: var(--green);  }
   body.fail    { --theme: var(--red);    }
 
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Arial;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;display:flex;align-items:center;justify-content:center;padding:18px}
-
-  .wrap{ width:min(1040px,98vw); display:flex; flex-direction:column; gap:14px; align-items:center; animation:intro .42s var(--trans) both; }
+  .wrap{ width:min(1040px,98vw); display:flex; flex-direction:column; gap:14px; align-items:center; animation:intro .42s var(--trans) both; padding-bottom:18px; }
   @keyframes intro{ from{opacity:0; transform:translateY(-10px)} to{opacity:1; transform:none} }
 
   header{ width:100%; display:flex; justify-content:space-between; align-items:center; gap:12px; padding:4px 2px; }
@@ -48,8 +56,7 @@
     overflow:visible;
     transition: transform var(--trans), box-shadow var(--trans), border-color var(--trans);
   }
-  .card:hover{ transform: translateY(-6px); box-shadow: 0 18px 40px rgba(2,6,10,0.78); border-color: rgba(255,255,255,0.06); }
-
+  .card:active{ transform: translateY(-2px) scale(.999); }
   .card .title{ display:flex; justify-content:space-between; align-items:center; gap:10px; margin-bottom:10px; }
   .card .title strong{ color:var(--theme); transition:color var(--trans); font-size:15px; }
 
@@ -76,14 +83,15 @@
     background:linear-gradient(180deg, rgba(255,255,255,0.005), rgba(255,255,255,0.003));
     color:var(--text); font-size:16px; text-align:center; transition: transform 220ms ease, border-color var(--trans), box-shadow var(--trans);
     -moz-appearance: textfield;
+    min-height:44px;
   }
   input[type="number"]::-webkit-inner-spin-button,
   input[type="number"]::-webkit-outer-spin-button{ -webkit-appearance:none; margin:0; }
   input[type="number"]:focus{ outline:none; transform:translateY(-4px) scale(1.01); border-color:rgba(255,255,255,0.10); box-shadow: 0 14px 34px rgba(0,0,0,0.65); }
 
-  .btn{ margin-top:12px; padding:12px 14px; border-radius:10px; border:2px solid var(--theme); background:transparent; color:var(--theme); font-weight:700; cursor:pointer; transition: transform 160ms ease, background var(--trans), color var(--trans); position:relative; overflow:hidden; width:100%; }
-  .btn:hover{ transform:translateY(-5px); background: rgba(255,255,255,0.015); }
-  .btn:active{ transform:translateY(-3px) scale(.995); }
+  .btn{ margin-top:12px; padding:16px 14px; border-radius:12px; border:2px solid var(--theme); background:transparent; color:var(--theme); font-weight:800; cursor:pointer; transition: transform 160ms ease, background var(--trans), color var(--trans); position:relative; overflow:hidden; width:100%; font-size:16px; min-height:48px; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+  .btn:hover{ transform:translateY(-4px); background: rgba(255,255,255,0.015); }
+  .btn:active{ transform:translateY(-2px) scale(.997); }
 
   .btn .r{ position:absolute; left:50%; top:50%; width:140%; height:260%; background:var(--theme); opacity:0.03; transform:translate(-50%,-50%) scale(0); border-radius:50%; transition:transform 600ms ease, opacity 600ms; pointer-events:none; }
   .btn:active .r{ transform:translate(-50%,-50%) scale(1); opacity:0.08; transition:transform 180ms ease, opacity 300ms; }
@@ -100,6 +108,7 @@
 
   footer{ margin-top:8px; color:var(--muted); font-size:13px; width:100%; text-align:center; }
 
+  /* Mobile tweaks */
   @media(max-width:980px){
     .grid{ grid-template-columns:1fr; gap:12px; }
     header{ flex-direction:column; align-items:flex-start; gap:8px; }
@@ -107,8 +116,20 @@
     .wrap{ padding:14px; width:100%; }
     .field{ min-width:100%; }
     .result{ font-size:16px; padding:10px 12px; }
-    .card{ padding:12px; border-radius:12px; }
+    .card{ padding:14px; border-radius:12px; }
     .corner{ display:none; }
+    input[type="number"]{ font-size:18px; padding:14px; min-height:52px; }
+    .btn{ padding:16px; font-size:17px; min-height:52px; border-radius:12px; }
+  }
+
+  /* Extra small phones: bigger touch targets */
+  @media(max-width:420px){
+    html,body{ padding-left:12px; padding-right:12px; }
+    .wrap{ gap:12px; }
+    body{ font-size:15px; }
+    .card{ padding:12px; border-radius:12px; }
+    .inputs{ gap:8px; }
+    .field label{ font-size:13px; }
   }
 </style>
 </head>
@@ -117,6 +138,7 @@
     <header>
       <div class="brand">
         <h1>CalcCMM</h1>
+        <p>Calcula NP, AE necessária, recuperação e PRF — mobile friendly.</p>
       </div>
     </header>
 
@@ -126,11 +148,11 @@
         <div class="title"><strong>Calcular NP</strong><div style="color:var(--muted);font-size:13px">AP média + GIP + AE</div></div>
 
         <div class="inputs" role="group" aria-label="Inputs para calcular NP">
-          <div class="field"><label>AP1 (0–10)</label><input id="ap1" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP2 (0–10)</label><input id="ap2" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP3 (0–10)</label><input id="ap3" type="number" max="10" min="0" /></div>
-          <div class="field"><label>GIP (0–1)</label><input id="gip" type="number" max="1" min="0" step="0.01" /></div>
-          <div class="field"><label>AE (0–10)</label><input id="ae" type="number" max="10" min="0" /></div>
+          <div class="field"><label for="ap1">AP1 (0–10)</label><input id="ap1" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="ap2">AP2 (0–10)</label><input id="ap2" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="ap3">AP3 (0–10)</label><input id="ap3" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="gip">GIP (0–1)</label><input id="gip" inputmode="decimal" type="number" max="1" min="0" step="0.01" /></div>
+          <div class="field"><label for="ae">AE (0–10)</label><input id="ae" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularNP()" aria-label="Calcular NP">Calcular NP <span class="r"></span></button>
@@ -143,10 +165,10 @@
         <div class="title"><strong>Quanto preciso tirar na AE?</strong><div style="color:var(--muted);font-size:13px">Meta fixa: NP = 6</div></div>
 
         <div class="inputs">
-          <div class="field"><label>AP1 (0–10)</label><input id="ap1x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP2 (0–10)</label><input id="ap2x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>AP3 (0–10)</label><input id="ap3x" type="number" max="10" min="0" /></div>
-          <div class="field"><label>GIP (0–1)</label><input id="gipx" type="number" max="1" min="0" step="0.01" /></div>
+          <div class="field"><label for="ap1x">AP1 (0–10)</label><input id="ap1x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="ap2x">AP2 (0–10)</label><input id="ap2x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="ap3x">AP3 (0–10)</label><input id="ap3x" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="gipx">GIP (0–1)</label><input id="gipx" inputmode="decimal" type="number" max="1" min="0" step="0.01" /></div>
         </div>
 
         <button class="btn" onclick="calcularAE()">Calcular AE necessária <span class="r"></span></button>
@@ -159,7 +181,7 @@
         <div class="title"><strong>Quanto preciso na recuperação?</strong><div style="color:var(--muted);font-size:13px">((NP + x) / 2) = 6 → x = 12 - NP</div></div>
 
         <div class="inputs">
-          <div class="field" style="min-width:160px"><label>NP atual (0–10)</label><input id="npRec" type="number" max="10" min="0" /></div>
+          <div class="field" style="min-width:160px"><label for="npRec">NP atual (0–10)</label><input id="npRec" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularRecuperacao()">Calcular Recuperação <span class="r"></span></button>
@@ -172,9 +194,9 @@
         <div class="title"><strong>Passei na PRF?</strong><div style="color:var(--muted);font-size:13px">Média das 3 NPs — precisa ser ≥ 6</div></div>
 
         <div class="inputs">
-          <div class="field"><label>NP1 (0–10)</label><input id="prf_np1" type="number" max="10" min="0" /></div>
-          <div class="field"><label>NP2 (0–10)</label><input id="prf_np2" type="number" max="10" min="0" /></div>
-          <div class="field"><label>NP3 (0–10)</label><input id="prf_np3" type="number" max="10" min="0" /></div>
+          <div class="field"><label for="prf_np1">NP1 (0–10)</label><input id="prf_np1" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="prf_np2">NP2 (0–10)</label><input id="prf_np2" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
+          <div class="field"><label for="prf_np3">NP3 (0–10)</label><input id="prf_np3" inputmode="decimal" type="number" max="10" min="0" step="0.1" /></div>
         </div>
 
         <button class="btn" onclick="calcularPRF()">Verificar PRF <span class="r"></span></button>
@@ -216,7 +238,8 @@ function aplicarTemaPorValor(valor){
 }
 
 function val(id){
-  const v = parseFloat(document.getElementById(id).value);
+  const raw = document.getElementById(id).value;
+  const v = parseFloat(raw.replace(',', '.'));
   return (isFinite(v) ? v : 0);
 }
 
@@ -268,12 +291,21 @@ document.querySelectorAll('input[type="number"]').forEach(i=>{
       }
     }
   });
+  // mobile friendly: tap selects content
+  i.addEventListener('touchstart', ()=> { try { i.select(); } catch(e){} });
 });
 
 document.querySelectorAll('.btn').forEach(b=>{
   if(!b.querySelector('.r')){ const s=document.createElement('span'); s.className='r'; b.appendChild(s); }
 });
+
+// accessibility: allow action with space on focused button via keyboard
+document.addEventListener('keydown', e => {
+  if((e.key === ' ' || e.key === 'Spacebar') && document.activeElement && document.activeElement.classList.contains('btn')){
+    e.preventDefault();
+    document.activeElement.click();
+  }
+});
 </script>
 </body>
 </html>
-
