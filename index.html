@@ -26,11 +26,9 @@
   --shadow-strong:0 44px 160px rgba(2,6,10,0.72);
   --ui-gap:16px;
   --ui-pad:18px;
-  --ripple-color: rgba(255,255,255,0.12);
 }
 @media (prefers-reduced-motion: reduce){
   *{animation-duration:1ms !important;transition-duration:1ms !important}
-  :root{--glass-blur:12px;--wet-glow:0.12}
 }
 *{box-sizing:border-box;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
 html,body{
@@ -83,7 +81,17 @@ body::after{
   animation:floatSlow 26s linear infinite reverse;
 }
 @keyframes floatSlow{0%{transform:translateY(0)}50%{transform:translateY(-18px)}100%{transform:translateY(0)}}
-.wrap{position:relative;z-index:1;width:min(1040px,98vw);display:flex;flex-direction:column;gap:var(--ui-gap);align-items:stretch;margin:18px 0;padding:8px}
+.wrap{
+  position:relative;
+  z-index:1;
+  width:min(1040px,98vw);
+  display:flex;
+  flex-direction:column;
+  gap:var(--ui-gap);
+  align-items:stretch;
+  margin:18px 0;
+  padding:8px;
+}
 header{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:6px 8px;z-index:1}
 .brand h1{margin:0;color:var(--theme);font-size:26px;font-weight:800;letter-spacing:0.4px;text-shadow:0 14px 48px rgba(0,0,0,0.55)}
 .brand p{margin:4px 0 0 0;color:var(--muted);font-size:13px}
@@ -100,13 +108,18 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px;pa
   box-shadow:var(--shadow-soft);
   transition:transform 420ms var(--soft-ease),box-shadow 420ms var(--soft-ease),border-color 320ms var(--fast-ease);
   will-change:transform;
-  transform-style:preserve-3d;
-  --mx:0;
-  --my:0;
-  --sheenX:50%;
-  --sheenY:-20%;
 }
-.card .wet-rim{position:absolute;inset:-2px;pointer-events:none;border-radius:calc(var(--card-radius) + 2px);background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.00));padding:2px;filter:blur(8px);opacity:var(--wet-glow);z-index:0}
+.card .wet-rim{
+  position:absolute;
+  inset:-2px;
+  pointer-events:none;
+  border-radius:calc(var(--card-radius) + 2px);
+  background:linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.00));
+  padding:2px;
+  filter:blur(8px);
+  opacity:var(--wet-glow);
+  z-index:0;
+}
 .card::before{
   content:"";
   position:absolute;
@@ -131,7 +144,7 @@ header{display:flex;justify-content:space-between;align-items:center;gap:12px;pa
   transition:opacity 420ms var(--fast-ease);
   z-index:0;
 }
-.card:hover{transform:translateY(-14px) rotateX(calc((var(--my) - 0.5) * 6deg)) rotateY(calc((var(--mx) - 0.5) * -6deg));box-shadow:var(--shadow-strong);border-color:rgba(255,255,255,0.10)}
+.card:hover{transform:translateY(-14px);box-shadow:var(--shadow-strong);border-color:rgba(255,255,255,0.10)}
 .card:active{transform:translateY(-4px) scale(.997)}
 .accent{height:8px;width:100%;border-radius:14px;overflow:hidden;position:absolute;left:0;top:-16px;z-index:1;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.02),transparent)}
 .accent::before{
@@ -185,10 +198,6 @@ footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:ce
 .droplet.med{width:48px;height:48px;background:radial-gradient(circle at 36% 36%, rgba(255,255,255,0.6), rgba(255,255,255,0.06));opacity:0.12;animation-duration:11.2s}
 .droplet.big{width:88px;height:88px;background:radial-gradient(circle at 30% 30%, rgba(255,255,255,0.5), rgba(255,255,255,0.03));opacity:0.08;animation-duration:14s}
 @keyframes rise{0%{transform:translateY(8px) scale(.98);opacity:0}12%{opacity:0.18}60%{transform:translateY(-28px) scale(1.02);opacity:0.12}100%{transform:translateY(-64px) scale(1.04);opacity:0}}
-.card-ripple{position:absolute;border-radius:50%;pointer-events:none;border:2px solid var(--ripple-color);box-shadow:0 8px 32px rgba(0,0,0,0.45), 0 0 30px var(--ripple-color);opacity:0;transform:scale(0);will-change:transform,opacity}
-.card-sheen{position:absolute;left:0;top:0;right:0;bottom:0;border-radius:inherit;pointer-events:none;background:radial-gradient(circle at var(--sheenX) var(--sheenY), rgba(255,255,255,0.85), rgba(255,255,255,0.06) 6%, rgba(255,255,255,0.02) 14%, transparent 28%);mix-blend-mode:overlay;opacity:0.12;filter:blur(18px)}
-.sparkle{position:absolute;pointer-events:none;border-radius:50%;mix-blend-mode:screen;filter:blur(6px);opacity:0;animation:spark 2200ms linear infinite}
-@keyframes spark{0%{opacity:0;transform:scale(0.6)}10%{opacity:0.9;transform:scale(1)}90%{opacity:0.1;transform:scale(1.2)}100%{opacity:0;transform:scale(1.4)}}
 @media (max-width:980px){
   .grid{grid-template-columns:1fr;gap:12px}
   header{flex-direction:column;align-items:flex-start;gap:8px}
@@ -220,7 +229,6 @@ footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:ce
     <main class="grid" aria-live="polite">
       <section class="card" id="card-np" style="overflow:visible">
         <div class="wet-rim" aria-hidden="true"></div>
-        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Calcular NP</strong><div style="color:var(--muted);font-size:13px">AP média + GIP + AE</div></div>
 
@@ -237,12 +245,11 @@ footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:ce
         <div class="corner">→</div>
 
         <div class="droplet small" style="left:6%;bottom:8%"></div>
-        <div class="droplet med" style="right:10%;bottom:14%"></div>
+        <div class="droplet.med" style="right:10%;bottom:14%"></div>
       </section>
 
       <section class="card" id="card-ae" style="overflow:visible">
         <div class="wet-rim" aria-hidden="true"></div>
-        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Quanto preciso tirar na AE?</strong><div style="color:var(--muted);font-size:13px">Meta fixa: NP = 6</div></div>
 
@@ -262,7 +269,6 @@ footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:ce
 
       <section class="card" id="card-rec" style="overflow:visible">
         <div class="wet-rim" aria-hidden="true"></div>
-        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Quanto preciso na recuperação?</strong><div style="color:var(--muted);font-size:13px">((NP + x) / 2) = 6 → x = 12 - NP</div></div>
 
@@ -279,7 +285,6 @@ footer{margin-top:8px;color:var(--muted);font-size:13px;width:100%;text-align:ce
 
       <section class="card" id="card-prf" style="overflow:visible">
         <div class="wet-rim" aria-hidden="true"></div>
-        <div class="card-sheen" aria-hidden="true"></div>
         <div class="accent" aria-hidden="true"></div>
         <div class="title"><strong>Passei na PRF?</strong><div style="color:var(--muted);font-size:13px">Média das 3 NPs — precisa ser ≥ 6</div></div>
 
@@ -387,64 +392,6 @@ document.querySelectorAll('.btn').forEach(b=>{
   });
 });
 document.addEventListener('pointerup',()=>{document.querySelectorAll('.btn .r').forEach(r=>{r.style.transition='opacity 260ms linear, transform 260ms var(--fast-ease)';r.style.transform='scale(1)';r.style.opacity='0'})});
-document.querySelectorAll('.card').forEach((card)=>{
-  const prefersReduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const sheen=card.querySelector('.card-sheen');
-  if(!prefersReduced){
-    card.addEventListener('pointerdown',(ev)=>{
-      const rect=card.getBoundingClientRect();
-      const x=ev.clientX-rect.left;
-      const y=ev.clientY-rect.top;
-      const ripple=document.createElement('div');
-      ripple.className='card-ripple';
-      const size=Math.max(rect.width,rect.height)*1.2;
-      ripple.style.width=size+'px';
-      ripple.style.height=size+'px';
-      ripple.style.left=(x-size/2)+'px';
-      ripple.style.top=(y-size/2)+'px';
-      card.appendChild(ripple);
-      requestAnimationFrame(()=>{ripple.style.transition='transform 720ms var(--soft-ease), opacity 720ms linear';ripple.style.transform='scale(1)';ripple.style.opacity='0.14'});
-      setTimeout(()=>{ripple.style.opacity='0';ripple.style.transform='scale(1.6)'},260);
-      setTimeout(()=>{if(ripple&&ripple.parentNode)ripple.parentNode.removeChild(ripple)},880);
-      for(let i=0;i<6;i++){
-        const sp=document.createElement('div');
-        sp.className='sparkle';
-        const s=(Math.random()*8)+6;
-        sp.style.width=s+'px';
-        sp.style.height=s+'px';
-        sp.style.left=(Math.random()*80+8)+'%';
-        sp.style.top=(Math.random()*70+10)+'%';
-        sp.style.background=`radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9), rgba(255,255,255,0.12))`;
-        sp.style.animationDuration=(1200+Math.random()*1200)+'ms';
-        card.appendChild(sp);
-        setTimeout(()=>{if(sp&&sp.parentNode)sp.parentNode.removeChild(sp)},1700);
-      }
-    });
-    let raf=false;
-    card.addEventListener('pointermove',(ev)=>{
-      if(prefersReduced) return;
-      if(!raf){
-        raf=true;
-        requestAnimationFrame(()=>{
-          const rect=card.getBoundingClientRect();
-          const mx=(ev.clientX-rect.left)/rect.width;
-          const my=(ev.clientY-rect.top)/rect.height;
-          card.style.setProperty('--mx',mx);
-          card.style.setProperty('--my',my);
-          card.style.setProperty('--sheenX',Math.round(mx*100)+'%');
-          card.style.setProperty('--sheenY',Math.round(my*100-30)+'%');
-          raf=false;
-        });
-      }
-    });
-    card.addEventListener('pointerleave',()=>{
-      card.style.setProperty('--mx',0.5);
-      card.style.setProperty('--my',0.5);
-      card.style.setProperty('--sheenX','50%');
-      card.style.setProperty('--sheenY','-20%');
-    });
-  }
-});
 document.querySelectorAll('.card').forEach((c,i)=>{c.style.opacity=0;c.style.transform='translateY(12px) scale(0.996)';setTimeout(()=>{c.style.transition='opacity 520ms var(--soft-ease), transform 520ms var(--soft-ease)';c.style.opacity=1;c.style.transform='translateY(0) scale(1)'},70+i*60)});
 document.addEventListener('keydown',e=>{if((e.key===' '||e.key==='Spacebar')&&document.activeElement&&document.activeElement.classList.contains('btn')){e.preventDefault();document.activeElement.click()}});
 </script>
